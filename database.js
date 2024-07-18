@@ -6,6 +6,9 @@ const app = express()
 //Mongoose Connect to Database
 mongoose.connect('mongodb://localhost:27017/')
 
+app.use(express.json())
+
+//Api hit and available routes
 app.use('/api/auth', require('./routes/auth'))
 app.use('/api/notes', require('./routes/notes'))
 
