@@ -12,11 +12,12 @@ app.use(express.json())
 app.use('/api/auth', require('./routes/auth'))
 app.use('/api/notes', require('./routes/notes'))
 
-
+//first page show "hello json" in web page
 app.get("/" , (req,res) =>{
     res.send("hello json")
 })
 
+//run on 5000 localhost
 app.listen(5000, ()=>{
     console.log("server is running ")
 })
