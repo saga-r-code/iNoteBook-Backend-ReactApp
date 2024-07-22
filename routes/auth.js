@@ -2,6 +2,10 @@ const express = require("express");
 const Users = require("../models/Users");
 const router = express.Router(); //express router create
 const { body, validationResult } = require("express-validator"); //this pakage for valid info
+const bcrypt = require("bcryptjs"); //this pakage for hash password
+const jwt = require("jsonwebtoken"); //this pakage for generate token
+
+const JWT_SAFFKEY = 'Sagee$plash' // this is secrate key for the sign in
 
 //Create User using: POST "/api/auth/createuser". doen't require authentication
 router.post(
@@ -10,9 +14,7 @@ router.post(
     //validation add
     body("name", "Enter a valid name").isLength({ min: 3 }),
     body("email", "Enter a valid email").isEmail(),
-    body("password", "Password must be at least 8 characters").isLength({
-      min: 8,
-    }),
+    body("password", "Password must be at least 8 characters").isLength({min: 8,}),
   ],
   async (req, res) => {
     //Vaildation error check
@@ -24,30 +26,46 @@ router.post(
 
     //this block of code create a new user in database and check the user email are exist or not
     try {
-      let user = await Users.findOne({ email: req.body.email }); //return promise and find email if already exist than return otherwise create new user
+      let user = await Users.findOne({ email: req.body.email }); //return promise and find email 
       console.log(user); // show the if already exist than console object of that user otherwise console null
-      if (user) {
+      if (user) { //if already exist than return otherwise create new user
         return res.status(400).json({ error: "this email is already exist" });
       }
-      //create new user when
+
+      const salt = await bcrypt.genSalt(10) //genrating salt
+      const safePass = await bcrypt.hash(req.body.password, salt); //return promises genrating hash 
+      // console.log(safePass)
+
+      //create new user when if condition false
       user = await Users.create({
         name: req.body.name,
         email: req.body.email,
-        password: req.body.password,
+        password: safePass,
       });
 
-      // .then((user) => res.json(user))
+      const data ={//  the payload for the JWT with additional claims and data is encode throgh "jwt"
+        user:{
+          id: user.id,
+        }
+    }
+      const token  = jwt.sign(data, JWT_SAFFKEY) //jwt.sign() get two param data is payload  and JWT Key is safe key sign is for the authenticity
+      // token is already synchronous that means doesn't require promises
+      // res.json({token})  //token as json formate send // error show
+     
+
+      console.log(req.body); //show in console for debugging purpose
+      res.send(req.body);
+       // .then((user) => res.json(user))
       // .catch((err) => {
       //   console.log(err);
       //   res.json({ error: "please add unique value in email",message: err.message,})
       // });
-
-      console.log(req.body); //show in console for debugging purpose
-      res.send(req.body);
+      
     } 
     catch (error) {
       //if any mistake in code than show error and catch
       console.error(error.message);
+      console.error("Stack Trace:", error.stack);
       res.status(500).send("Some Error Are fond");
     }
   }
