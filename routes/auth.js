@@ -1,9 +1,11 @@
+
 const express = require("express");
 const Users = require("../models/Users");
 const router = express.Router(); //express router create
 const { body, validationResult } = require("express-validator"); //this pakage for valid info
 const bcrypt = require("bcryptjs"); //this pakage for hash password
 const jwt = require("jsonwebtoken"); //this pakage for generate token
+const User = require("../models/Users");
 
 const JWT_SAFFKEY = 'Sagee$plash' // this is secrate key for the sign in
 
@@ -51,6 +53,7 @@ router.post(
       const token  = jwt.sign(data, JWT_SAFFKEY) //jwt.sign() get two param data is payload  and JWT Key is safe key sign is for the authenticity
       // token is already synchronous that means doesn't require promises
       // res.json({token})  //token as json formate send // error show
+      console.log(token)
      
 
       console.log(req.body); //show in console for debugging purpose
@@ -60,15 +63,73 @@ router.post(
       //   console.log(err);
       //   res.json({ error: "please add unique value in email",message: err.message,})
       // });
-      
+
     } 
     catch (error) {
       //if any mistake in code than show error and catch
       console.error(error.message);
       console.error("Stack Trace:", error.stack);
-      res.status(500).send("Some Error Are fond");
+      res.status(500).send("Internal server error");
     }
   }
 );
+
+//Create User using: POST "/api/auth/login". no  login required
+router.post(
+  "/login",
+  [
+    //validation add
+    body("email", "Enter a valid email").isEmail(),
+    body("password", "please enter password").exists(), 
+  ],
+  async (req, res) => {
+     //Vaildation error check
+     const errors = validationResult(req);
+     if (!errors.isEmpty()) {
+       //if error than return message and status
+       return res.status(400).json({ errors: errors.array() });
+     }
+
+     const  {email, password} = req.body;
+    //  console.log(req.body)
+    
+
+     try {
+      let user = await User.findOne({email})//find user by email
+      if(!user){
+        return  res.status(400).json({error: "please try to fill correct information"})//user not found then error show
+      }
+     
+
+      const comparePassword = await bcrypt.compare(password, user.password) // compare passowrd
+      console.log(comparePassword)
+      
+       // If password doesn't match, return error
+      if(!comparePassword){
+        return res.status(400).json({error: "please try to fill correct information"})
+      }
+
+      const data = {
+        user:{
+          id: user.id
+        }
+      }
+
+      const token  = jwt.sign(data, JWT_SAFFKEY)
+      // res.json({token})
+      console.log(token)
+      
+     }
+      catch (error) {
+       //if any mistake in code than show error and catch
+       console.error(error.message);
+       console.error("Stack Trace:", error.stack);
+       res.status(500).send("Internal Server error");
+     }
+    }
+)
+
+
+
 
 module.exports = router;

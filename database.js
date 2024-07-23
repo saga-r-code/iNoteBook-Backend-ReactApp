@@ -2,6 +2,7 @@ const express = require('express')
 const mongoose = require('mongoose')
 
 const app = express()
+const port = 5000
 
 //Mongoose Connect to Database
 mongoose.connect('mongodb://localhost:27017/inotebook')
@@ -18,7 +19,7 @@ app.get("/" , (req,res) =>{
 })
 
 //run on 5000 localhost
-app.listen(5000, ()=>{
-    console.log("server is running ")
+app.listen(port, ()=>{
+    console.log(`server is running on http://localhost:${port}/ `)
 })
 
