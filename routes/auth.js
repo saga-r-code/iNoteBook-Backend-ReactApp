@@ -104,7 +104,7 @@ router.post(
       }
      
 
-      const comparePassword = await bcrypt.compare(password, user.password) // compare passowrd
+      const comparePassword = await bcrypt.compare(password, user.password) // compare passowrd find in database
       console.log(comparePassword)
       
        // If password doesn't match, return error
