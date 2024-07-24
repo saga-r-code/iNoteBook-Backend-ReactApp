@@ -6,10 +6,11 @@ const { body, validationResult } = require("express-validator"); //this pakage f
 const bcrypt = require("bcryptjs"); //this pakage for hash password
 const jwt = require("jsonwebtoken"); //this pakage for generate token
 const User = require("../models/Users");
+const fetchuser = require("../middleware/fetchuser")
 
 const JWT_SAFFKEY = 'Sagee$plash' // this is secrate key for the sign in
 
-//Create User using: POST "/api/auth/createuser". doen't require authentication
+//Route 1 : Create User using: POST "/api/auth/createuser". doen't require authentication
 router.post(
   "/createuser",
   [
@@ -52,19 +53,12 @@ router.post(
     }
       const token  = jwt.sign(data, JWT_SAFFKEY) //jwt.sign() get two param data is payload  and JWT Key is safe key sign is for the authenticity
       // token is already synchronous that means doesn't require promises
-      // res.json({token})  //token as json formate send // error show
-      // console.log(token)
-     
 
       console.log(req.body); //show in console for debugging purpose
-      res.send({response: req.body, output: token});
-       // .then((user) => res.json(user))
-      // .catch((err) => {
-      //   console.log(err);
-      //   res.json({ error: "please add unique value in email",message: err.message,})
-      // });
-
+      res.send({response: req.body, output: "success"});
+      // res.send({response: req.body, output: token});//when you depoly project than you dont want to show token
     } 
+
     catch (error) {
       //if any mistake in code than show error and catch
       console.error(error.message);
@@ -74,7 +68,7 @@ router.post(
   }
 );
 
-//Create User using: POST "/api/auth/login". no  login required
+//Route 2 : Create User using: POST "/api/auth/login". no  login required
 router.post(
   "/login",
   [
@@ -122,8 +116,9 @@ router.post(
       }
 
       const token  = jwt.sign(data, JWT_SAFFKEY)
-      // res.json({token})
-      res.status(200).json({ token });
+      res.status(200).json({ token }); //when you depoly project than you dont want to show token 
+      // res.send({output: "success"});
+
       
      }
       catch (error) {
@@ -135,6 +130,29 @@ router.post(
     }
 )
 
+// Route 3 :  get loggedin user details: POST "/api/auth/getuser".login required
+router.post( "/getuser", fetchuser, async (req, res) => { //fetchuser is middleware function 
+     //Vaildation error check
+     const errors = validationResult(req);
+     if (!errors.isEmpty()) {
+       //if error than return message and status
+       return res.status(400).json({ errors: errors.array() });
+     }
+
+     try {
+      let userId = req.user.id // get user id
+      const user = await User.findById(userId).select("-password") // select method select all data except password
+      res.send(user)
+     } 
+
+     catch (error) {
+       //if any mistake in code than show error and catch
+       console.error(error.message);
+       console.error("Stack Trace:", error.stack);
+       res.status(500).send("Internal Server error");
+     }
+  }
+)
 
 
 
