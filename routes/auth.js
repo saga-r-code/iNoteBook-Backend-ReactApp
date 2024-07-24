@@ -53,11 +53,11 @@ router.post(
       const token  = jwt.sign(data, JWT_SAFFKEY) //jwt.sign() get two param data is payload  and JWT Key is safe key sign is for the authenticity
       // token is already synchronous that means doesn't require promises
       // res.json({token})  //token as json formate send // error show
-      console.log(token)
+      // console.log(token)
      
 
       console.log(req.body); //show in console for debugging purpose
-      res.send(req.body);
+      res.send({response: req.body, output: token});
        // .then((user) => res.json(user))
       // .catch((err) => {
       //   console.log(err);
@@ -99,6 +99,9 @@ router.post(
       if(!user){
         return  res.status(400).json({error: "please try to fill correct information"})//user not found then error show
       }
+      else{
+        console.log("done email")
+      }
      
 
       const comparePassword = await bcrypt.compare(password, user.password) // compare passowrd
@@ -107,6 +110,9 @@ router.post(
        // If password doesn't match, return error
       if(!comparePassword){
         return res.status(400).json({error: "please try to fill correct information"})
+      }
+      else{
+        console.log("done password")
       }
 
       const data = {
@@ -117,7 +123,7 @@ router.post(
 
       const token  = jwt.sign(data, JWT_SAFFKEY)
       // res.json({token})
-      console.log(token)
+      res.status(200).json({ token });
       
      }
       catch (error) {
@@ -128,6 +134,8 @@ router.post(
      }
     }
 )
+
+
 
 
 
