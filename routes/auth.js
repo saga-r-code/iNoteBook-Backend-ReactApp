@@ -6,18 +6,18 @@ const { body, validationResult } = require("express-validator"); //this pakage f
 const bcrypt = require("bcryptjs"); //this pakage for hash password
 const jwt = require("jsonwebtoken"); //this pakage for generate token
 const User = require("../models/Users");
-const fetchuser = require("../middleware/fetchuser")
+const fetchuser = require("../middleware/fetchuser") //you can use the function in you components 
 
 const JWT_SAFFKEY = 'Sagee$plash' // this is secrate key for the sign in
 
 //Route 1 : Create User using: POST "/api/auth/createuser". doen't require authentication
 router.post(
-  "/createuser",
+  "/createuser",//endpoint
   [
     //validation add
-    body("name", "Enter a valid name").isLength({ min: 3 }),
+    body("name", "Enter a valid name").isLength({ min: 3 }), //minimum letter
     body("email", "Enter a valid email").isEmail(),
-    body("password", "Password must be at least 8 characters").isLength({min: 8,}),
+    body("password", "Password must be at least 8 characters").isLength({min: 8,}), //minimum character
   ],
   async (req, res) => {
     //Vaildation error check
