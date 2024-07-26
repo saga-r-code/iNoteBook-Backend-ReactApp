@@ -43,7 +43,9 @@ router.post(
       user = await Users.create({
         name: req.body.name,
         email: req.body.email,
-        password: safePass,
+        password: safePass, //hash pass
+        // password: req.body.password,  //normal text password 
+
       });
 
       const data ={//  the payload for the JWT with additional claims and data is encode throgh "jwt"
@@ -68,7 +70,7 @@ router.post(
   }
 );
 
-//Route 2 : Create User using: POST "/api/auth/login". no  login required
+//Route 2 : Login user: POST "/api/auth/login". no  login required
 router.post(
   "/login",
   [
