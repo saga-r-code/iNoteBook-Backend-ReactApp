@@ -20,6 +20,6 @@ app.get("/" , (req,res) =>{
 
 //run on 5000 localhost
 app.listen(port, ()=>{
-    console.log(`server is running on http://localhost:${port}/ `)
+    console.log(`iNotebook backend server is running on http://localhost:${port}/ `)
 })
 
