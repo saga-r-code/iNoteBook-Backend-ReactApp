@@ -1,8 +1,10 @@
 const express = require('express')
 const mongoose = require('mongoose')
+const cors = require('cors');
 
 const app = express()
-const port = 5000
+const port = process.env.PORT || 5000;
+app.use(cors()); // Enable CORS for all origins
 
 //Mongoose Connect to Database
 mongoose.connect('mongodb://localhost:27017/inotebook')
