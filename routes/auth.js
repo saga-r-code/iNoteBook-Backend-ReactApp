@@ -79,6 +79,7 @@ router.post(
     body("password", "please enter password").exists(), 
   ],
   async (req, res) => {
+    let success = false
      //Vaildation error check
      const errors = validationResult(req);
      if (!errors.isEmpty()) {
@@ -93,7 +94,7 @@ router.post(
      try {
       let user = await User.findOne({email})//find user by email
       if(!user){
-        return  res.status(400).json({error: "please try to fill correct information"})//user not found then error show
+        return  res.status(400).json({error: "please try to fill correct information", success})//user not found then error show
       }
       else{
         console.log("done email")
@@ -105,7 +106,7 @@ router.post(
       
        // If password doesn't match, return error
       if(!comparePassword){
-        return res.status(400).json({error: "please try to fill correct information"})
+        return res.status(400).json({error: "please try to fill correct information", success})
       }
       else{
         console.log("done password")
@@ -118,7 +119,7 @@ router.post(
       }
 
       const token  = jwt.sign(data, JWT_SAFFKEY)
-      res.status(200).json({ token }); //when you depoly project than you dont want to show token 
+      res.status(200).json({ token , success: true}); //when you depoly project than you dont want to show token 
       // res.send({output: "success"});
 
       
