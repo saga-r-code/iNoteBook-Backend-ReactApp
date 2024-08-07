@@ -13,9 +13,18 @@ const JWT_SAFFKEY = "Sagee$plash"; // this is secrate key for the sign in
 router.post(
   "/createuser", //endpoint
   [
-    //validation add
+    //validation added
     body("name", "Enter a valid name").isLength({ min: 3 }), //minimum letter
-    body("email", "Enter a valid email").isEmail(),
+    body("email", "Enter a valid email")
+      .isEmail()
+      .withMessage("Enter Valid Email")
+      .toLowerCase()
+      .custom((val) => {
+        if (/[A-Z]/.test(val)) {
+          return Promise.reject("Email must be lowercase");
+        }
+        return true
+      }),
     body("password", "Password must be at least 8 characters").isLength({
       min: 8,
     }), //minimum character
